@@ -1,32 +1,13 @@
-using ConsoleGame.Classes.Objects.Movable;
-
 namespace ConsoleGame.Classes.Objects;
 
-public enum WallOrientation
+public enum WallType
 {
   Horizontal,
   Vertical
 }
 
-public class Wall : GameObject, ICollidable
+public class Wall(Vector2 position, WallType type = WallType.Horizontal)
+  : GameObject(type == WallType.Vertical ? '|' : '-', position)
 {
-  public WallOrientation WallOrientation { get; init; }
-
-  public Wall(Vector2 position, WallOrientation orientation = WallOrientation.Vertical)
-    : base(position, orientation == WallOrientation.Vertical ? '|' : '-')
-  {
-    WallOrientation = orientation;
-  }
-
-  public void OnCollision(MovableObject movingObject)
-  {
-    switch (movingObject)
-    {
-      case Player player:
-        GameBoard.ClearAt(player.Position);
-        player.RevertMove();
-        Draw();
-        break;
-    }
-  }
+  public WallType Type { get; } = type;
 }

@@ -1,21 +1,17 @@
 namespace ConsoleGame.Classes;
 
-public struct Vector2
+public struct Vector2(int x, int y)
 {
-  public int X { get; set; }
+  public int X { get; set; } = x;
 
-  public int Y { get; set; }
-
-  public Vector2(int x, int y)
-  {
-    X = x;
-    Y = y;
-  }
+  public int Y { get; set; } = y;
 
   public readonly Vector2 Add(Vector2 other)
   {
     return new Vector2(X + other.X, Y + other.Y);
   }
+
+  public readonly Vector2 ScalarMultiply(int scalar) => new(X * scalar, Y * scalar);
 
   public static Vector2 operator +(Vector2 a, Vector2 b)
   {
@@ -32,17 +28,13 @@ public struct Vector2
     return !(a == b);
   }
 
-  public override int GetHashCode()
+  public readonly override int GetHashCode()
   {
     return HashCode.Combine(X, Y);
   }
 
-  public override bool Equals(object? obj)
+  public readonly override bool Equals(object? obj)
   {
-    if (obj is Vector2 other)
-    {
-      return X == other.X && Y == other.Y;
-    }
-    return false;
+    return obj is Vector2 other && X == other.X && Y == other.Y;
   }
 }
