@@ -6,8 +6,8 @@ namespace ConsoleGame.Classes.Objects;
 public class GameBoard
 {
   bool isRunning = true;
-  readonly int Width = Console.WindowWidth;
-  readonly int Height = Console.WindowHeight;
+  const int Width = 100;
+  const int Height = 30;
   public readonly ObservableCollection<GameObject> Objects = [];
   public readonly Player player;
 
@@ -25,6 +25,8 @@ public class GameBoard
 
   private GameBoard()
   {
+    WatchObjectsCollection();
+    LevelManager.Init(1);
     CreateBorders();
     player = new(new Vector2(Console.WindowWidth / 2, Console.WindowHeight / 2));
     Objects.Add(player);
@@ -32,20 +34,11 @@ public class GameBoard
 
     Objects.Add(new Coin(new Vector2(5, 5)));
 
-    player.OnPointsChanged += (sender, points) =>
-    {
-      Console.SetCursorPosition(2, Height - 2);
-      Console.Write($"Points: {points}");
-    };
+    SubscribeToStatusBarUpdates();
+  }
 
-    foreach (var obj in Objects)
-    {
-      if (obj is MovableObject movable)
-      {
-        movable.OnPositionChanged += HandleCollision;
-      }
-    }
-
+  void WatchObjectsCollection()
+  {
     Objects.CollectionChanged += (sender, e) =>
     {
       if (e.NewItems != null)
@@ -80,6 +73,14 @@ public class GameBoard
           }
         }
       }
+    };
+  }
+
+  void SubscribeToStatusBarUpdates()
+  {
+    player.OnPointsChanged += (sender, points) =>
+    {
+      DrawStatusBar();
     };
   }
 
@@ -163,6 +164,7 @@ public class GameBoard
     for (int x = 0; x < Width; x++)
     {
       Objects.Add(new Wall(new Vector2(x, 0)));
+      Objects.Add(new Wall(new(x, Height - 3)));
       Objects.Add(new Wall(new Vector2(x, Height - 1)));
     }
 
@@ -175,13 +177,9 @@ public class GameBoard
 
   private void DrawStatusBar()
   {
-    for (int x = 0; x < Width; x++)
-    {
-      Objects.Add(new Wall(new(x, Height - 3)));
-    }
-
     Console.SetCursorPosition(2, Height - 2);
-    Console.Write($"Points: {player.Points}");
+    Console.Write($"Points: {player.Points}, ");
+    Console.Write($"Level: {LevelManager.Instance.CurrentLevel}, ");
   }
 
   public static void DrawAt(Vector2 position, char symbol)
